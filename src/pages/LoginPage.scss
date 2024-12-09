@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700');
+
+$background-login: #2c497f;
+$background-signup: #433b7c;
+$primary-color: #ed6a5e;
+$input-background: rgb(255, 255, 255);
+$input-border: rgba(255, 255, 255, 0);
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    margin: 0;
+    color: #fff;
+    background: $background-login;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-block-wrapper {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    transition: background-color 0.5s ease-in-out;
+
+    &--is-login {
+        background-color: $background-login;
+    }
+
+    &--is-signup {
+        background-color: $background-signup;
+    }
+}
+
+.form-block {
+    background: rgb(255, 255, 255,0.1);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+    &__header {
+        text-align: center;
+        margin-bottom: 20px;
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 10px;
+        }
+
+        p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    }
+
+    .toggle-button {
+        background: none;
+        border: none;
+        color: $primary-color;
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 14px;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    .form-block__input-wrapper {
+        margin-bottom: 20px;
+
+        .form-group__input {
+            width: 100%;
+            padding: 12px 10px;
+            margin-bottom: 15px;
+            border: 1px solid $input-border;
+            background: $input-background;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 4px;
+
+            &:focus {
+                outline: none;
+                border-color: #fff;
+                background: transparent;
+            }
+        }
+    }
+
+    .button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        background: $primary-color;
+        border: none;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        text-transform: uppercase;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+
+    .error-message {
+        color: #ff6542;
+        font-size: 14px;
+        margin-top: 10px;
+        text-align: center;
+    }
+}
