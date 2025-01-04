@@ -24,6 +24,10 @@ function LoginPage() {
                 setMessage("Account created successfully! You can now sign in.");
             } else {
                 const response = await loginUser(email, password);
+
+                // Save email to localStorage after login
+                localStorage.setItem("userEmail", email);
+
                 setMessage(`Welcome, ${response.data.email}!`);
                 navigate("/ads"); // Redirect to ads page
             }
