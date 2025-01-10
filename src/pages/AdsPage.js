@@ -26,6 +26,7 @@ import {
   Settings,
   Sort as SortIcon,
   FilterList as FilterIcon,
+  AccountCircle,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,9 +50,14 @@ const shine = keyframes`
 
 // Styled Components
 const PageContainer = styled(Box)({
-  background: '#0a0a0a',
+  background: 'linear-gradient(135deg, #0a0a0a 0%, #0a2818 50%, #0a0a0a 100%)',
   minHeight: '100vh',
-  padding: '20px 0',
+  minWidth: '100vw',
+  margin: 0,
+  padding: 0,
+  position: 'relative',
+  overflow: 'hidden',
+  boxSizing: 'border-box',
 });
 
 const SearchBar = styled(Box)(({ theme }) => ({
@@ -61,7 +67,6 @@ const SearchBar = styled(Box)(({ theme }) => ({
   padding: '20px',
   background: 'rgba(10, 10, 10, 0.8)',
   backdropFilter: 'blur(10px)',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
 }));
 
 const CarCard = styled(Card)(({ theme }) => ({
@@ -167,7 +172,7 @@ function AdsPage() {
               />
             </Grid>
             <Grid item xs={12} md={8}>
-              <Box display="flex" gap={2}>
+              <Box display="flex" gap={2} alignItems="center">
                 <FormControl fullWidth>
                   <Select
                     value={filters.brand}
@@ -191,6 +196,20 @@ function AdsPage() {
                     <MenuItem value="newest">Newest First</MenuItem>
                   </Select>
                 </FormControl>
+                <Button
+                  variant="contained"
+                  startIcon={<AccountCircle />}
+                  onClick={() => navigate('/account')}
+                  sx={{
+                    backgroundColor: '#1DB954',
+                    '&:hover': {
+                      backgroundColor: '#18a449',
+                    },
+                    minWidth: '150px'
+                  }}
+                >
+                  My Account
+                </Button>
               </Box>
             </Grid>
           </Grid>

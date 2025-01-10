@@ -1,6 +1,114 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Box, styled } from '@mui/material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DirectionsCar, Speed, Palette, Settings } from '@mui/icons-material';
+
+const PageContainer = styled(Box)({
+  background: 'linear-gradient(135deg, #0a0a0a 0%, #0a2818 50%, #0a0a0a 100%)',
+  minHeight: '100vh',
+  minWidth: '100vw',
+  margin: 0,
+  padding: 0,
+  position: 'relative',
+  overflow: 'hidden',
+  boxSizing: 'border-box',
+  color: '#fff',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'radial-gradient(circle at 50% 50%, rgba(29, 185, 84, 0.1) 0%, transparent 50%)',
+    pointerEvents: 'none',
+  }
+});
+
+const ContentContainer = styled(Box)({
+  padding: '20px',
+  position: 'relative',
+  zIndex: 1,
+  maxWidth: '100%',
+  overflow: 'auto',
+  maxHeight: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '20px',
+  '&::-webkit-scrollbar': {
+    display: 'none'
+  },
+  '-ms-overflow-style': 'none',
+  'scrollbarWidth': 'none'
+});
+
+const StyledButton = styled('button')(({ variant }) => ({
+  padding: '10px 20px',
+  backgroundColor: variant === 'delete' ? '#FF4C4C' : '#1DB954',
+  color: 'white',
+  border: 'none',
+  cursor: 'pointer',
+  borderRadius: '5px',
+  margin: '10px',
+  '&:hover': {
+    backgroundColor: variant === 'delete' ? '#FF6B6B' : '#1ed760',
+  }
+}));
+
+const AdCard = styled(Box)({
+  background: 'rgba(255, 255, 255, 0.1)',
+  borderRadius: '10px',
+  padding: '20px',
+  marginBottom: '20px',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+});
+
+const FormContainer = styled(Box)({
+  background: 'rgba(255, 255, 255, 0.1)',
+  borderRadius: '10px',
+  padding: '20px',
+  marginTop: '20px',
+  backdropFilter: 'blur(10px)',
+  '& input, & textarea': {
+    width: '100%',
+    padding: '10px',
+    margin: '10px 0',
+    background: 'rgba(255, 255, 255, 0.1)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '5px',
+    color: 'white',
+    '&::placeholder': {
+      color: 'rgba(255, 255, 255, 0.5)',
+    }
+  }
+});
+
+const AnimatedHeader = styled(motion.header)({
+  background: 'rgba(255, 255, 255, 0.1)',
+  padding: '15px 25px',
+  borderRadius: '10px',
+  marginBottom: '20px',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+});
+
+const AnimatedText = styled(motion.span)({
+  background: 'linear-gradient(90deg, #1DB954, #1ed760)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  fontWeight: 'bold',
+});
+
+const AnimatedAdCard = styled(motion(AdCard))({
+  // păstrează stilurile existente din AdCard
+});
+
+const AnimatedFormContainer = styled(motion(FormContainer))({
+  // păstrează stilurile existente din FormContainer
+});
 
 function UserAccount() {
     const navigate = useNavigate();
@@ -136,133 +244,144 @@ function UserAccount() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <header style={{ marginBottom: '20px' }}>
-                <h2>User Account</h2>
-                <p>Logged in as: <strong>{userEmail}</strong></p>
-            </header>
-
-            {loading ? (
-                <p>Loading your data...</p>
-            ) : (
-                <div>
-                    <section style={{ marginBottom: '40px' }}>
-                        <h3>My Listed Cars</h3>
-                        {userAds.length > 0 ? (
-                            <ul>
-                                {userAds.map((ad) => (
-                                    <li key={ad.id} style={{ marginBottom: '20px' }}>
-                                        <h4>{ad.carDTO.brand} {ad.carDTO.model}</h4>
-                                        <p><strong>VIN:</strong> {ad.carDTO.vin}</p>
-                                        <p><strong>Body:</strong> {ad.carDTO.body}</p>
-                                        <p><strong>Year:</strong> {ad.carDTO.yearOfManufacture}</p>
-                                        <p><strong>Kilometers:</strong> {ad.carDTO.km} km</p>
-                                        <p><strong>Fuel Type:</strong> {ad.carDTO.fuelType}</p>
-                                        <p><strong>Gearbox:</strong> {ad.carDTO.gearBox}</p>
-                                        <p><strong>Cylindrical Capacity:</strong> {ad.carDTO.cylindricalCapacity} cc</p>
-                                        <p><strong>Horsepower:</strong> {ad.carDTO.horsePower} HP</p>
-                                        <p><strong>Color:</strong> {ad.carDTO.color}</p>
-                                        <button
-                                            onClick={() => handleDeleteAd(ad.id)}
-                                            style={{
-                                                padding: '5px 10px',
-                                                backgroundColor: '#FF4C4C',
-                                                color: 'white',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                borderRadius: '5px',
-                                            }}
-                                        >
-                                            Delete Ad
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>You have no listed cars.</p>
-                        )}
-                    </section>
-
-                    <button
-                        onClick={() => setShowForm(true)}
-                        style={{
-                            padding: '10px 20px',
-                            backgroundColor: '#4CAF50',
-                            color: 'white',
-                            border: 'none',
-                            cursor: 'pointer',
-                            borderRadius: '5px',
-                        }}
+        <PageContainer>
+            <ContentContainer>
+                <AnimatedHeader
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                    <motion.h2
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
                     >
-                        Add New Ad
-                    </button>
+                        User Account
+                    </motion.h2>
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                    >
+                        Logged in as: <AnimatedText>{userEmail}</AnimatedText>
+                    </motion.p>
+                </AnimatedHeader>
 
-                    {showForm && (
-                        <div>
-                            {step === 1 ? (
+                {loading ? (
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        Loading your data...
+                    </motion.p>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <section>
+                            <motion.h3
+                                initial={{ x: -20 }}
+                                animate={{ x: 0 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                My Listed Cars
+                            </motion.h3>
+                            
+                            {userAds.length > 0 ? (
                                 <div>
-                                    <h3>Step 1: Enter Car Details</h3>
-                                    <form>
-                                        <input type="text" name="vin" value={carData.vin} onChange={handleCarDataChange} placeholder="VIN" />
-                                        <input type="text" name="brand" value={carData.brand} onChange={handleCarDataChange} placeholder="Brand" />
-                                        <input type="text" name="model" value={carData.model} onChange={handleCarDataChange} placeholder="Model" />
-                                        <input type="text" name="body" value={carData.body} onChange={handleCarDataChange} placeholder="Body" />
-                                        <input type="number" name="yearOfManufacture" value={carData.yearOfManufacture} onChange={handleCarDataChange} placeholder="Year of Manufacture" />
-                                        <input type="number" name="km" value={carData.km} onChange={handleCarDataChange} placeholder="Kilometers" />
-                                        <input type="text" name="fuelType" value={carData.fuelType} onChange={handleCarDataChange} placeholder="Fuel Type" />
-                                        <input type="text" name="gearBox" value={carData.gearBox} onChange={handleCarDataChange} placeholder="Gearbox" />
-                                        <input type="number" name="cylindricalCapacity" value={carData.cylindricalCapacity} onChange={handleCarDataChange} placeholder="Cylindrical Capacity" />
-                                        <input type="number" name="horsePower" value={carData.horsePower} onChange={handleCarDataChange} placeholder="Horsepower" />
-                                        <input type="text" name="color" value={carData.color} onChange={handleCarDataChange} placeholder="Color" />
-                                    </form>
-                                    <button onClick={handleNextStep}>Next</button>
+                                    {userAds.map((ad, index) => (
+                                        <AnimatedAdCard
+                                            key={ad.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.1 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            whileHover={{ scale: 1.02 }}
+                                        >
+                                            <h4>{ad.carDTO.brand} {ad.carDTO.model}</h4>
+                                            <p><DirectionsCar sx={{ color: '#1DB954' }} /> <strong>Brand:</strong> {ad.carDTO.brand}</p>
+                                            <p><Speed sx={{ color: '#1DB954' }} /> <strong>Kilometers:</strong> {ad.carDTO.km} km</p>
+                                            <p><Palette sx={{ color: '#1DB954' }} /> <strong>Color:</strong> {ad.carDTO.color}</p>
+                                            <p><Settings sx={{ color: '#1DB954' }} /> <strong>Gearbox:</strong> {ad.carDTO.gearBox}</p>
+                                            <StyledButton 
+                                                variant="delete"
+                                                onClick={() => handleDeleteAd(ad.id)}
+                                            >
+                                                Delete Ad
+                                            </StyledButton>
+                                        </AnimatedAdCard>
+                                    ))}
                                 </div>
                             ) : (
-                                <div>
-                                    <h3>Step 2: Enter Ad Details</h3>
-                                    <form>
-                                        <input type="text" name="title" value={adData.title} onChange={handleAdDataChange} placeholder="Ad Title" />
-                                        <textarea name="description" value={adData.description} onChange={handleAdDataChange} placeholder="Ad Description" />
-                                        <input type="number" name="price" value={adData.price} onChange={handleAdDataChange} placeholder="Price" />
-                                    </form>
-                                    <button onClick={handleNextStep}>Submit</button>
-                                </div>
+                                <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                >
+                                    You have no listed cars.
+                                </motion.p>
                             )}
-                        </div>
-                    )}
-                </div>
-            )}
+                        </section>
 
-            <button
-                onClick={handleLogout}
-                style={{
-                    marginTop: '20px',
-                    padding: '10px 20px',
-                    backgroundColor: '#FF4C4C',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    borderRadius: '5px',
-                }}
-            >
-                Logout
-            </button>
+                        <StyledButton onClick={() => setShowForm(true)}>
+                            Add New Ad
+                        </StyledButton>
 
-            <button
-                onClick={handleDeleteAccount}
-                style={{
-                    marginTop: '20px',
-                    padding: '10px 20px',
-                    backgroundColor: '#FF4C4C',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    borderRadius: '5px',
-                }}
-            >
-                Delete Account
-            </button>
-        </div>
+                        <AnimatePresence>
+                            {showForm && (
+                                <AnimatedFormContainer
+                                    initial={{ opacity: 0, y: 50 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 50 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    {step === 1 ? (
+                                        <div>
+                                            <h3>Step 1: Enter Car Details</h3>
+                                            <form>
+                                                <input type="text" name="vin" value={carData.vin} onChange={handleCarDataChange} placeholder="VIN" />
+                                                <input type="text" name="brand" value={carData.brand} onChange={handleCarDataChange} placeholder="Brand" />
+                                                <input type="text" name="model" value={carData.model} onChange={handleCarDataChange} placeholder="Model" />
+                                                <input type="text" name="body" value={carData.body} onChange={handleCarDataChange} placeholder="Body" />
+                                                <input type="number" name="yearOfManufacture" value={carData.yearOfManufacture} onChange={handleCarDataChange} placeholder="Year of Manufacture" />
+                                                <input type="number" name="km" value={carData.km} onChange={handleCarDataChange} placeholder="Kilometers" />
+                                                <input type="text" name="fuelType" value={carData.fuelType} onChange={handleCarDataChange} placeholder="Fuel Type" />
+                                                <input type="text" name="gearBox" value={carData.gearBox} onChange={handleCarDataChange} placeholder="Gearbox" />
+                                                <input type="number" name="cylindricalCapacity" value={carData.cylindricalCapacity} onChange={handleCarDataChange} placeholder="Cylindrical Capacity" />
+                                                <input type="number" name="horsePower" value={carData.horsePower} onChange={handleCarDataChange} placeholder="Horsepower" />
+                                                <input type="text" name="color" value={carData.color} onChange={handleCarDataChange} placeholder="Color" />
+                                            </form>
+                                            <StyledButton onClick={handleNextStep}>Next</StyledButton>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <h3>Step 2: Enter Ad Details</h3>
+                                            <form>
+                                                <input type="text" name="title" value={adData.title} onChange={handleAdDataChange} placeholder="Ad Title" />
+                                                <textarea name="description" value={adData.description} onChange={handleAdDataChange} placeholder="Ad Description" />
+                                                <input type="number" name="price" value={adData.price} onChange={handleAdDataChange} placeholder="Price" />
+                                            </form>
+                                            <StyledButton onClick={handleNextStep}>Submit</StyledButton>
+                                        </div>
+                                    )}
+                                </AnimatedFormContainer>
+                            )}
+                        </AnimatePresence>
+
+                        <Box sx={{ mt: 3 }}>
+                            <StyledButton variant="delete" onClick={handleLogout}>
+                                Logout
+                            </StyledButton>
+                            <StyledButton variant="delete" onClick={handleDeleteAccount}>
+                                Delete Account
+                            </StyledButton>
+                        </Box>
+                    </motion.div>
+                )}
+            </ContentContainer>
+        </PageContainer>
     );
 }
 
