@@ -371,6 +371,19 @@ function UserAccount() {
                         </AnimatePresence>
 
                         <Box sx={{ mt: 3 }}>
+                            <StyledButton 
+                                onClick={() => navigate('/ads')}
+                                sx={{ 
+                                    backgroundColor: '#1DB954',
+                                    opacity: 0.9,
+                                    '&:hover': {
+                                        backgroundColor: '#1ed760',
+                                        opacity: 1
+                                    }
+                                }}
+                            >
+                                Back to Ads
+                            </StyledButton>
                             <StyledButton variant="delete" onClick={handleLogout}>
                                 Logout
                             </StyledButton>

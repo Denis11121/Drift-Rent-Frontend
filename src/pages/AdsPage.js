@@ -27,6 +27,7 @@ import {
   Sort as SortIcon,
   FilterList as FilterIcon,
   AccountCircle,
+  AttachMoney,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -119,18 +120,95 @@ function AdsPage() {
     search: '',
     priceRange: [0, 1000],
     brand: 'all',
+    horsePower: [0, 1000],
+    kilometers: [0, 500000],
+    yearRange: [1990, new Date().getFullYear()],
+    fuelType: 'all',
+    gearBox: 'all',
     sort: 'price-asc',
   });
 
+  const carBrands = [
+    'Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 
+    'Toyota', 'Honda', 'Ford', 'Chevrolet', 'Tesla',
+    'Hyundai', 'Kia', 'Mazda', 'Nissan', 'Lexus',
+    'Volvo', 'Jaguar', 'Land Rover', 'Subaru', 'Mini'
+  ];
+
+  const fuelTypes = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'Plug-in Hybrid'];
+  const transmissionTypes = ['Manual', 'Automatic', 'Semi-automatic', 'CVT'];
+
   useEffect(() => {
     fetchAds();
-  }, [filters]);
+  }, [filters]); // This will re-fetch when any filter changes
 
   const fetchAds = async () => {
     try {
-      const response = await fetch('http://localhost:8081/ad/all');
+      // Build query parameters based on filters
+      const queryParams = new URLSearchParams();
+      
+      if (filters.brand && filters.brand !== 'all') {
+        queryParams.append('brand', filters.brand);
+      }
+      if (filters.fuelType && filters.fuelType !== 'all') {
+        queryParams.append('fuelType', filters.fuelType);
+      }
+      if (filters.gearBox && filters.gearBox !== 'all') {
+        queryParams.append('gearBox', filters.gearBox);
+      }
+      if (filters.priceRange) {
+        queryParams.append('minPrice', filters.priceRange[0]);
+        queryParams.append('maxPrice', filters.priceRange[1]);
+      }
+      if (filters.horsePower) {
+        queryParams.append('minHorsePower', filters.horsePower[0]);
+        queryParams.append('maxHorsePower', filters.horsePower[1]);
+      }
+      if (filters.kilometers) {
+        queryParams.append('minKm', filters.kilometers[0]);
+        queryParams.append('maxKm', filters.kilometers[1]);
+      }
+      
+      // Sort options
+      if (filters.sort) {
+        const [field, order] = filters.sort.split('-');
+        queryParams.append('sort', field);
+        queryParams.append('order', order);
+      }
+
+      // Text search (assuming it searches in title or description)
+      if (filters.search) {
+        queryParams.append('search', filters.search);
+      }
+
+      // Make the API call with query parameters
+      const response = await fetch(`http://localhost:8081/ad/all?${queryParams}`);
       const data = await response.json();
-      setAds(data);
+      
+      // Apply client-side filtering for immediate response
+      let filteredData = data;
+      
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filteredData = filteredData.filter(ad => 
+          ad.title.toLowerCase().includes(searchLower) ||
+          ad.description.toLowerCase().includes(searchLower) ||
+          ad.carDTO.brand.toLowerCase().includes(searchLower) ||
+          ad.carDTO.model.toLowerCase().includes(searchLower)
+        );
+      }
+
+      // Apply sorting
+      if (filters.sort) {
+        filteredData = [...filteredData].sort((a, b) => {
+          if (filters.sort === 'price-asc') return a.price - b.price;
+          if (filters.sort === 'price-desc') return b.price - a.price;
+          if (filters.sort === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+          return 0;
+        });
+      }
+
+      setAds(filteredData);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching ads:', error);
@@ -147,7 +225,7 @@ function AdsPage() {
       <SearchBar>
         <Container maxWidth="lg">
           <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -171,21 +249,53 @@ function AdsPage() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={8}>
-              <Box display="flex" gap={2} alignItems="center">
-                <FormControl fullWidth>
+            
+            <Grid item xs={12}>
+              <Box display="flex" gap={2} flexWrap="wrap">
+                <FormControl sx={{ minWidth: 200 }}>
+                  <Typography color="white" gutterBottom>Brand</Typography>
                   <Select
                     value={filters.brand}
                     onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
                     sx={{ color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
                   >
                     <MenuItem value="all">All Brands</MenuItem>
-                    <MenuItem value="bmw">BMW</MenuItem>
-                    <MenuItem value="mercedes">Mercedes</MenuItem>
-                    <MenuItem value="audi">Audi</MenuItem>
+                    {carBrands.map(brand => (
+                      <MenuItem key={brand} value={brand.toLowerCase()}>{brand}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
-                <FormControl fullWidth>
+
+                <FormControl sx={{ minWidth: 200 }}>
+                  <Typography color="white" gutterBottom>Fuel Type</Typography>
+                  <Select
+                    value={filters.fuelType}
+                    onChange={(e) => setFilters({ ...filters, fuelType: e.target.value })}
+                    sx={{ color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                  >
+                    <MenuItem value="all">All Types</MenuItem>
+                    {fuelTypes.map(type => (
+                      <MenuItem key={type} value={type.toLowerCase()}>{type}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ minWidth: 200 }}>
+                  <Typography color="white" gutterBottom>Transmission</Typography>
+                  <Select
+                    value={filters.gearBox}
+                    onChange={(e) => setFilters({ ...filters, gearBox: e.target.value })}
+                    sx={{ color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                  >
+                    <MenuItem value="all">All Types</MenuItem>
+                    {transmissionTypes.map(type => (
+                      <MenuItem key={type} value={type.toLowerCase()}>{type}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ minWidth: 200 }}>
+                  <Typography color="white" gutterBottom>Sort By</Typography>
                   <Select
                     value={filters.sort}
                     onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
@@ -194,27 +304,86 @@ function AdsPage() {
                     <MenuItem value="price-asc">Price: Low to High</MenuItem>
                     <MenuItem value="price-desc">Price: High to Low</MenuItem>
                     <MenuItem value="newest">Newest First</MenuItem>
+                    <MenuItem value="hp-desc">Horsepower: High to Low</MenuItem>
+                    <MenuItem value="km-asc">Kilometers: Low to High</MenuItem>
                   </Select>
                 </FormControl>
-                <Button
-                  variant="contained"
-                  startIcon={<AccountCircle />}
-                  onClick={() => navigate('/account')}
-                  sx={{
-                    backgroundColor: '#1DB954',
-                    '&:hover': {
-                      backgroundColor: '#18a449',
-                    },
-                    minWidth: '150px'
-                  }}
-                >
-                  My Account
-                </Button>
               </Box>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Box sx={{ px: 2 }}>
+                    <Typography color="white" gutterBottom>Price Range ($)</Typography>
+                    <Slider
+                      value={filters.priceRange}
+                      onChange={(e, newValue) => setFilters({ ...filters, priceRange: newValue })}
+                      valueLabelDisplay="auto"
+                      min={0}
+                      max={1000}
+                      sx={{ color: '#1DB954' }}
+                    />
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Box sx={{ px: 2 }}>
+                    <Typography color="white" gutterBottom>Horsepower</Typography>
+                    <Slider
+                      value={filters.horsePower}
+                      onChange={(e, newValue) => setFilters({ ...filters, horsePower: newValue })}
+                      valueLabelDisplay="auto"
+                      min={0}
+                      max={1000}
+                      sx={{ color: '#1DB954' }}
+                    />
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Box sx={{ px: 2 }}>
+                    <Typography color="white" gutterBottom>Kilometers</Typography>
+                    <Slider
+                      value={filters.kilometers}
+                      onChange={(e, newValue) => setFilters({ ...filters, kilometers: newValue })}
+                      valueLabelDisplay="auto"
+                      min={0}
+                      max={500000}
+                      sx={{ color: '#1DB954' }}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Container>
       </SearchBar>
+
+      <Box sx={{ 
+        position: 'absolute', 
+        top: 20, 
+        right: 20, 
+        zIndex: 101 
+      }}>
+        <Button
+          variant="contained"
+          startIcon={<AccountCircle />}
+          onClick={() => navigate('/account')}
+          sx={{
+            backgroundColor: '#1DB954',
+            color: '#fff',
+            borderRadius: '50px',
+            padding: '10px 20px',
+            '&:hover': {
+              backgroundColor: '#1ed760',
+            },
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          My Account
+        </Button>
+      </Box>
 
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         {loading ? (
@@ -223,50 +392,46 @@ function AdsPage() {
           </Box>
         ) : (
           <Grid container spacing={3}>
-            {ads.map((ad, index) => (
+            {ads.map((ad) => (
               <Grid item xs={12} sm={6} md={4} key={ad.id}>
-                <Fade in={true} style={{ transitionDelay: `${index * 100}ms` }}>
+                <Fade in={true}>
                   <CarCard onClick={() => handleCardClick(ad.id)}>
-                    <Box sx={{ position: 'relative' }}>
-                      <CarImage
-                        className="car-image"
-                        src={ad.imageUrl || 'https://via.placeholder.com/400x200'}
-                        alt={ad.title}
-                      />
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
-                          p: 2,
+                    <Box sx={{ p: 2 }}>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          mb: 2,
+                          color: '#1DB954', // Spotify green color
+                          fontWeight: 'bold',
+                          textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
                         }}
                       >
-                        <GradientText variant="h6">${ad.price}/day</GradientText>
-                      </Box>
-                    </Box>
-                    <Box sx={{ p: 2 }}>
-                      <Typography variant="h6" color="#fff" gutterBottom>
                         {ad.title}
                       </Typography>
-                      <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                         <FeatureChip
                           icon={<DirectionsCar />}
                           label={`${ad.carDTO.brand} ${ad.carDTO.model}`}
                         />
                         <FeatureChip
+                          icon={<AttachMoney />}
+                          label={`${ad.price}€`}
+                        />
+                      </Box>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        <FeatureChip
+                          icon={<Settings />}
+                          label={ad.carDTO.gearBox}
+                        />
+                        <FeatureChip
                           icon={<Speed />}
-                          label={`${ad.carDTO.horsePower}hp`}
+                          label={`${ad.carDTO.kilometers} km`}
                         />
                         <FeatureChip
                           icon={<LocalGasStation />}
                           label={ad.carDTO.fuelType}
                         />
                       </Box>
-                      <Typography variant="body2" color="#ccc" noWrap>
-                        {ad.description}
-                      </Typography>
                     </Box>
                   </CarCard>
                 </Fade>
