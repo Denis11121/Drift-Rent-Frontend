@@ -147,6 +147,7 @@ function AdsPage() {
       // Build query parameters based on filters
       const queryParams = new URLSearchParams();
       
+      // Add filter parameters only if they are not 'all' or empty
       if (filters.brand && filters.brand !== 'all') {
         queryParams.append('brand', filters.brand);
       }
@@ -156,59 +157,55 @@ function AdsPage() {
       if (filters.gearBox && filters.gearBox !== 'all') {
         queryParams.append('gearBox', filters.gearBox);
       }
-      if (filters.priceRange) {
+      
+      // Add range parameters
+      if (filters.priceRange[0] > 0) {
         queryParams.append('minPrice', filters.priceRange[0]);
+      }
+      if (filters.priceRange[1] < 1000) {
         queryParams.append('maxPrice', filters.priceRange[1]);
       }
-      if (filters.horsePower) {
+      
+      if (filters.horsePower[0] > 0) {
         queryParams.append('minHorsePower', filters.horsePower[0]);
+      }
+      if (filters.horsePower[1] < 1000) {
         queryParams.append('maxHorsePower', filters.horsePower[1]);
       }
-      if (filters.kilometers) {
+      
+      if (filters.kilometers[0] > 0) {
         queryParams.append('minKm', filters.kilometers[0]);
+      }
+      if (filters.kilometers[1] < 500000) {
         queryParams.append('maxKm', filters.kilometers[1]);
       }
       
-      // Sort options
-      if (filters.sort) {
-        const [field, order] = filters.sort.split('-');
-        queryParams.append('sort', field);
-        queryParams.append('order', order);
+      if (filters.yearRange[0] > 1990) {
+        queryParams.append('startYear', filters.yearRange[0]);
+      }
+      if (filters.yearRange[1] < new Date().getFullYear()) {
+        queryParams.append('endYear', filters.yearRange[1]);
       }
 
-      // Text search (assuming it searches in title or description)
-      if (filters.search) {
-        queryParams.append('search', filters.search);
+      // Fetch ads with filters
+      const response = await fetch(`http://localhost:8081/ad/filter?${queryParams}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch ads');
       }
-
-      // Make the API call with query parameters
-      const response = await fetch(`http://localhost:8081/ad/all?${queryParams}`);
-      const data = await response.json();
       
-      // Apply client-side filtering for immediate response
-      let filteredData = data;
+      let data = await response.json();
       
+      // Apply search filter locally if search term exists
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        filteredData = filteredData.filter(ad => 
-          ad.title.toLowerCase().includes(searchLower) ||
-          ad.description.toLowerCase().includes(searchLower) ||
-          ad.carDTO.brand.toLowerCase().includes(searchLower) ||
-          ad.carDTO.model.toLowerCase().includes(searchLower)
+        const searchTerm = filters.search.toLowerCase();
+        data = data.filter(ad => 
+          ad.carDTO.brand.toLowerCase().includes(searchTerm) ||
+          ad.carDTO.model.toLowerCase().includes(searchTerm) ||
+          ad.description.toLowerCase().includes(searchTerm)
         );
       }
 
-      // Apply sorting
-      if (filters.sort) {
-        filteredData = [...filteredData].sort((a, b) => {
-          if (filters.sort === 'price-asc') return a.price - b.price;
-          if (filters.sort === 'price-desc') return b.price - a.price;
-          if (filters.sort === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
-          return 0;
-        });
-      }
-
-      setAds(filteredData);
+      setAds(data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching ads:', error);
