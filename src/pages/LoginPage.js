@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { loginUser, registerUser } from "../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Button,
   TextField,
@@ -10,6 +10,7 @@ import {
   Grow,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import CarIcon from '@mui/icons-material/DirectionsCar';
 import "./LoginPage.scss"; // For additional desktop-specific animations if needed.
 
 // Full-screen desktop-only background
@@ -87,6 +88,30 @@ const FormContainer = styled(Box)({
   width: "100%",
 });
 
+// Add Logo container styling
+const LogoContainer = styled(Link)({
+  position: "absolute",
+  top: "20px",
+  left: "20px",
+  zIndex: 2,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  textDecoration: 'none',
+  '& .car-icon': {
+    fontSize: '2.5rem',
+    color: '#1DB954',
+  },
+});
+
+const LogoText = styled(Typography)({
+  fontSize: '2rem',
+  fontWeight: 'bold',
+  background: 'linear-gradient(45deg, #1DB954, #fff)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+});
+
 function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
@@ -123,6 +148,10 @@ function LoginPage() {
 
   return (
     <DesktopBackground>
+      <LogoContainer to="/">
+        <CarIcon className="car-icon" />
+        <LogoText>DriftRent</LogoText>
+      </LogoContainer>
       <AnimatedOverlay />
       <Grow in>
         <StyledPaper>

@@ -28,8 +28,9 @@ import {
   FilterList as FilterIcon,
   AccountCircle,
   AttachMoney,
+  CarRental as CarIcon
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 // Animations
 const fadeIn = keyframes`
@@ -110,6 +111,29 @@ const FeatureChip = styled(Chip)({
   '&:hover': {
     backgroundColor: 'rgba(29, 185, 84, 0.2)',
   },
+});
+
+const LogoContainer = styled(Link)({
+  position: "absolute",
+  top: "20px",
+  left: "20px",
+  zIndex: 102,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  textDecoration: 'none',
+  '& .car-icon': {
+    fontSize: '2.5rem',
+    color: '#1DB954',
+  },
+});
+
+const LogoText = styled(Typography)({
+  fontSize: '2rem',
+  fontWeight: 'bold',
+  background: 'linear-gradient(45deg, #1DB954, #fff)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
 });
 
 function AdsPage() {
@@ -219,6 +243,10 @@ function AdsPage() {
 
   return (
     <PageContainer>
+      <LogoContainer to="/ads">
+        <CarIcon className="car-icon" />
+        <LogoText>DriftRent</LogoText>
+      </LogoContainer>
       <SearchBar>
         <Container maxWidth="lg">
           <Grid container spacing={3} alignItems="center">

@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Box, styled } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
-import { DirectionsCar, Speed, Palette, Settings } from '@mui/icons-material';
+import { Box, styled, Typography, Button, Grid, Chip, IconButton } from '@mui/material';
+import { motion, AnimatePresence, AnimateSharedLayout } from 'framer-motion';
+import { 
+  DirectionsCar, 
+  Speed, 
+  Palette, 
+  Settings,
+  CarRental as CarIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  LocalGasStation,
+  Speed as SpeedIcon,
+  ColorLens,
+  Build,
+  Timeline,
+  EmojiTransportation
+} from '@mui/icons-material';
 
 const PageContainer = styled(Box)({
   background: 'linear-gradient(135deg, #0a0a0a 0%, #0a2818 50%, #0a0a0a 100%)',
@@ -44,55 +59,18 @@ const ContentContainer = styled(Box)({
   'scrollbarWidth': 'none'
 });
 
-const StyledButton = styled('button')(({ variant }) => ({
-  padding: '10px 20px',
-  backgroundColor: variant === 'delete' ? '#FF4C4C' : '#1DB954',
-  color: 'white',
-  border: 'none',
-  cursor: 'pointer',
-  borderRadius: '5px',
-  margin: '10px',
-  '&:hover': {
-    backgroundColor: variant === 'delete' ? '#FF6B6B' : '#1ed760',
-  }
-}));
-
-const AdCard = styled(Box)({
-  background: 'rgba(255, 255, 255, 0.1)',
-  borderRadius: '10px',
-  padding: '20px',
-  marginBottom: '20px',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-});
-
-const FormContainer = styled(Box)({
-  background: 'rgba(255, 255, 255, 0.1)',
-  borderRadius: '10px',
-  padding: '20px',
-  marginTop: '20px',
-  backdropFilter: 'blur(10px)',
-  '& input, & textarea': {
-    width: '100%',
-    padding: '10px',
-    margin: '10px 0',
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    borderRadius: '5px',
-    color: 'white',
-    '&::placeholder': {
-      color: 'rgba(255, 255, 255, 0.5)',
-    }
-  }
-});
-
 const AnimatedHeader = styled(motion.header)({
-  background: 'rgba(255, 255, 255, 0.1)',
-  padding: '15px 25px',
-  borderRadius: '10px',
-  marginBottom: '20px',
+  background: 'rgba(18, 18, 18, 0.95)',
+  padding: '20px 30px',
+  borderRadius: '15px',
+  marginBottom: '30px',
+  marginTop: '80px',
   backdropFilter: 'blur(10px)',
   border: '1px solid rgba(255, 255, 255, 0.1)',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
 });
 
 const AnimatedText = styled(motion.span)({
@@ -102,13 +80,271 @@ const AnimatedText = styled(motion.span)({
   fontWeight: 'bold',
 });
 
-const AnimatedAdCard = styled(motion(AdCard))({
-  // păstrează stilurile existente din AdCard
+const AnimatedAdCard = styled(motion(Box))({
+  background: 'rgba(18, 18, 18, 0.95)',
+  borderRadius: '20px',
+  padding: '25px',
+  marginBottom: '20px',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.05), transparent)',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+  },
+  '&:hover::before': {
+    opacity: 1,
+  },
+});
+
+const FormContainer = styled(Box)({
+  background: 'rgba(18, 18, 18, 0.95)',
+  borderRadius: '15px',
+  padding: '30px',
+  marginTop: '20px',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+  '& h3': {
+    color: '#1DB954',
+    marginBottom: '20px',
+  },
+  '& input, & textarea': {
+    width: '100%',
+    padding: '12px',
+    margin: '10px 0',
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '1rem',
+    transition: 'all 0.3s ease',
+    '&::placeholder': {
+      color: 'rgba(255, 255, 255, 0.5)',
+    },
+    '&:focus': {
+      outline: 'none',
+      border: '1px solid #1DB954',
+      background: 'rgba(255, 255, 255, 0.1)',
+    }
+  },
+  '& textarea': {
+    minHeight: '100px',
+    resize: 'vertical',
+  }
+});
+
+const StyledButton = styled(Button)({
+  backgroundColor: '#1DB954',
+  color: 'white',
+  padding: '10px 24px',
+  borderRadius: '8px',
+  border: 'none',
+  fontSize: '1rem',
+  fontWeight: 'bold',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  marginTop: '20px',
+  '&:hover': {
+    backgroundColor: '#1ed760',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 5px 15px rgba(29, 185, 84, 0.3)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
+  }
 });
 
 const AnimatedFormContainer = styled(motion(FormContainer))({
   // păstrează stilurile existente din FormContainer
 });
+
+const LogoContainer = styled(Link)({
+  position: "fixed",
+  top: "20px",
+  left: "20px",
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  textDecoration: 'none',
+  '& .car-icon': {
+    fontSize: '2.5rem',
+    color: '#1DB954',
+  },
+  background: 'rgba(10, 10, 10, 0.5)',
+  padding: '8px 12px',
+  borderRadius: '12px',
+  backdropFilter: 'blur(8px)',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: 'rgba(10, 10, 10, 0.7)',
+    transform: 'translateY(2px)',
+  },
+});
+
+const LogoText = styled(Typography)({
+  fontSize: '2rem',
+  fontWeight: 'bold',
+  background: 'linear-gradient(45deg, #1DB954, #fff)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+});
+
+const HeaderActions = styled(Box)({
+  display: 'flex',
+  gap: '10px',
+});
+
+const HeaderButton = styled(Button)({
+  backgroundColor: 'rgba(29, 185, 84, 0.1)',
+  color: '#1DB954',
+  borderRadius: '20px',
+  padding: '8px 16px',
+  textTransform: 'none',
+  border: '1px solid rgba(29, 185, 84, 0.2)',
+  '&:hover': {
+    backgroundColor: 'rgba(29, 185, 84, 0.2)',
+    border: '1px solid rgba(29, 185, 84, 0.3)',
+  },
+});
+
+const StatsContainer = styled(Box)({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  gap: '20px',
+  marginBottom: '30px',
+});
+
+const StatCard = styled(motion.div)({
+  background: 'rgba(29, 185, 84, 0.1)',
+  borderRadius: '15px',
+  padding: '20px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+  transition: 'all 0.3s ease',
+  cursor: 'pointer',
+  '&:hover': {
+    transform: 'translateY(-5px)',
+    background: 'rgba(29, 185, 84, 0.15)',
+  },
+});
+
+const ActionBar = styled(motion.div)({
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '20px',
+  marginBottom: '30px',
+  padding: '20px',
+  background: 'rgba(18, 18, 18, 0.95)',
+  borderRadius: '15px',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+});
+
+const ActionButton = styled(motion.button)({
+  padding: '12px 24px',
+  borderRadius: '12px',
+  border: 'none',
+  cursor: 'pointer',
+  fontSize: '1rem',
+  fontWeight: 'bold',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  transition: 'all 0.3s ease',
+  background: 'linear-gradient(45deg, #1DB954, #1ed760)',
+  color: 'white',
+  boxShadow: '0 4px 15px rgba(29, 185, 84, 0.3)',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 20px rgba(29, 185, 84, 0.4)',
+  },
+  '&.delete': {
+    background: 'linear-gradient(45deg, #FF4C4C, #FF6B6B)',
+    boxShadow: '0 4px 15px rgba(255, 76, 76, 0.3)',
+    '&:hover': {
+      boxShadow: '0 6px 20px rgba(255, 76, 76, 0.4)',
+    },
+  },
+});
+
+const CardGrid = styled(motion.div)({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+  gap: '20px',
+  marginTop: '20px',
+});
+
+const StatsGrid = styled(motion.div)({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  gap: '20px',
+  marginBottom: '30px',
+});
+
+const StatCardEnhanced = styled(motion.div)({
+  background: 'linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.05))',
+  borderRadius: '20px',
+  padding: '25px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+  position: 'relative',
+  overflow: 'hidden',
+  border: '1px solid rgba(29, 185, 84, 0.2)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'radial-gradient(circle at top right, rgba(29, 185, 84, 0.2), transparent)',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+  },
+  '&:hover::before': {
+    opacity: 1,
+  },
+  '&:hover': {
+    transform: 'translateY(-5px)',
+    boxShadow: '0 10px 30px rgba(29, 185, 84, 0.2)',
+  },
+});
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  show: { 
+    y: 0, 
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100
+    }
+  }
+};
 
 function UserAccount() {
     const navigate = useNavigate();
@@ -245,26 +481,56 @@ function UserAccount() {
 
     return (
         <PageContainer>
+            <LogoContainer to="/ads">
+                <CarIcon className="car-icon" />
+                <LogoText>DriftRent</LogoText>
+            </LogoContainer>
             <ContentContainer>
                 <AnimatedHeader
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                    <motion.h2
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                    >
-                        User Account
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                    >
-                        Logged in as: <AnimatedText>{userEmail}</AnimatedText>
-                    </motion.p>
+                    <Box>
+                        <motion.h2
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            style={{ margin: 0, marginBottom: '8px' }}
+                        >
+                            User Account
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                            style={{ margin: 0, color: '#888' }}
+                        >
+                            Logged in as: <AnimatedText>{userEmail}</AnimatedText>
+                        </motion.p>
+                    </Box>
+                    <HeaderActions>
+                        <HeaderButton
+                            onClick={() => navigate('/ads')}
+                            startIcon={<DirectionsCar />}
+                        >
+                            Browse Ads
+                        </HeaderButton>
+                        <HeaderButton
+                            onClick={handleLogout}
+                            sx={{
+                                backgroundColor: 'rgba(255, 76, 76, 0.1)',
+                                color: '#FF4C4C',
+                                borderColor: 'rgba(255, 76, 76, 0.2)',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 76, 76, 0.2)',
+                                    borderColor: 'rgba(255, 76, 76, 0.3)',
+                                },
+                            }}
+                        >
+                            Logout
+                        </HeaderButton>
+                    </HeaderActions>
                 </AnimatedHeader>
 
                 {loading ? (
@@ -277,57 +543,150 @@ function UserAccount() {
                     </motion.p>
                 ) : (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
                     >
-                        <section>
-                            <motion.h3
-                                initial={{ x: -20 }}
-                                animate={{ x: 0 }}
-                                transition={{ duration: 0.5 }}
+                        <StatsGrid>
+                            <StatCardEnhanced
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                My Listed Cars
-                            </motion.h3>
-                            
-                            {userAds.length > 0 ? (
-                                <div>
-                                    {userAds.map((ad, index) => (
-                                        <AnimatedAdCard
-                                            key={ad.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            exit={{ opacity: 0, y: -20 }}
-                                            whileHover={{ scale: 1.02 }}
-                                        >
-                                            <h4>{ad.carDTO.brand} {ad.carDTO.model}</h4>
-                                            <p><DirectionsCar sx={{ color: '#1DB954' }} /> <strong>Brand:</strong> {ad.carDTO.brand}</p>
-                                            <p><Speed sx={{ color: '#1DB954' }} /> <strong>Kilometers:</strong> {ad.carDTO.km} km</p>
-                                            <p><Palette sx={{ color: '#1DB954' }} /> <strong>Color:</strong> {ad.carDTO.color}</p>
-                                            <p><Settings sx={{ color: '#1DB954' }} /> <strong>Gearbox:</strong> {ad.carDTO.gearBox}</p>
-                                            <StyledButton 
-                                                variant="delete"
-                                                onClick={() => handleDeleteAd(ad.id)}
-                                            >
-                                                Delete Ad
-                                            </StyledButton>
-                                        </AnimatedAdCard>
-                                    ))}
-                                </div>
-                            ) : (
-                                <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                >
-                                    You have no listed cars.
-                                </motion.p>
-                            )}
-                        </section>
+                                <EmojiTransportation sx={{ fontSize: 40, color: '#1DB954' }} />
+                                <Box>
+                                    <Typography variant="h4" color="#fff" fontWeight="bold">
+                                        {userAds.length}
+                                    </Typography>
+                                    <Typography color="#888">Active Listings</Typography>
+                                </Box>
+                            </StatCardEnhanced>
 
-                        <StyledButton onClick={() => setShowForm(true)}>
-                            Add New Ad
-                        </StyledButton>
+                            <StatCardEnhanced
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Timeline sx={{ fontSize: 40, color: '#1DB954' }} />
+                                <Box>
+                                    <Typography variant="h4" color="#fff" fontWeight="bold">
+                                        {userAds.reduce((total, ad) => total + parseInt(ad.carDTO.km), 0).toLocaleString()}
+                                    </Typography>
+                                    <Typography color="#888">Total Kilometers</Typography>
+                                </Box>
+                            </StatCardEnhanced>
+
+                            <StatCardEnhanced
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <SpeedIcon sx={{ fontSize: 40, color: '#1DB954' }} />
+                                <Box>
+                                    <Typography variant="h4" color="#fff" fontWeight="bold">
+                                        {userAds.reduce((max, ad) => Math.max(max, ad.carDTO.horsePower), 0)}
+                                    </Typography>
+                                    <Typography color="#888">Max Horsepower</Typography>
+                                </Box>
+                            </StatCardEnhanced>
+                        </StatsGrid>
+
+                        <ActionBar
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <ActionButton
+                                onClick={() => setShowForm(true)}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <AddIcon /> Add New Listing
+                            </ActionButton>
+                            <ActionButton
+                                className="delete"
+                                onClick={handleDeleteAccount}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <DeleteIcon /> Delete Account
+                            </ActionButton>
+                        </ActionBar>
+
+                        <CardGrid
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="show"
+                        >
+                            {userAds.map((ad, index) => (
+                                <AnimatedAdCard
+                                    key={ad.id}
+                                    variants={itemVariants}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    layout
+                                >
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                            <Typography variant="h5" color="#1DB954" gutterBottom fontWeight="bold">
+                                                {ad.carDTO.brand} {ad.carDTO.model}
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Box display="flex" gap={1} flexWrap="wrap">
+                                                <Chip
+                                                    icon={<SpeedIcon />}
+                                                    label={`${ad.carDTO.horsePower} HP`}
+                                                    sx={{ 
+                                                        background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                                                        color: '#1DB954',
+                                                        border: '1px solid rgba(29, 185, 84, 0.3)',
+                                                    }}
+                                                />
+                                                <Chip
+                                                    icon={<LocalGasStation />}
+                                                    label={ad.carDTO.fuelType}
+                                                    sx={{ 
+                                                        background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                                                        color: '#1DB954',
+                                                        border: '1px solid rgba(29, 185, 84, 0.3)',
+                                                    }}
+                                                />
+                                                <Chip
+                                                    icon={<Timeline />}
+                                                    label={`${ad.carDTO.km} km`}
+                                                    sx={{ 
+                                                        background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                                                        color: '#1DB954',
+                                                        border: '1px solid rgba(29, 185, 84, 0.3)',
+                                                    }}
+                                                />
+                                            </Box>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Typography color="#fff" fontSize="1.2rem" fontWeight="bold">
+                                                    ${ad.price}/day
+                                                </Typography>
+                                                <IconButton
+                                                    onClick={() => handleDeleteAd(ad.id)}
+                                                    sx={{ 
+                                                        color: '#FF4C4C',
+                                                        background: 'rgba(255, 76, 76, 0.1)',
+                                                        '&:hover': { 
+                                                            background: 'rgba(255, 76, 76, 0.2)',
+                                                            transform: 'scale(1.1)',
+                                                        }
+                                                    }}
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
+                                </AnimatedAdCard>
+                            ))}
+                        </CardGrid>
 
                         <AnimatePresence>
                             {showForm && (
@@ -369,28 +728,6 @@ function UserAccount() {
                                 </AnimatedFormContainer>
                             )}
                         </AnimatePresence>
-
-                        <Box sx={{ mt: 3 }}>
-                            <StyledButton 
-                                onClick={() => navigate('/ads')}
-                                sx={{ 
-                                    backgroundColor: '#1DB954',
-                                    opacity: 0.9,
-                                    '&:hover': {
-                                        backgroundColor: '#1ed760',
-                                        opacity: 1
-                                    }
-                                }}
-                            >
-                                Back to Ads
-                            </StyledButton>
-                            <StyledButton variant="delete" onClick={handleLogout}>
-                                Logout
-                            </StyledButton>
-                            <StyledButton variant="delete" onClick={handleDeleteAccount}>
-                                Delete Account
-                            </StyledButton>
-                        </Box>
                     </motion.div>
                 )}
             </ContentContainer>

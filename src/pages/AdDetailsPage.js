@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { styled } from '@mui/system';
 import {
   Typography,
@@ -15,6 +15,10 @@ import {
   TableCell,
   Chip,
 } from '@mui/material';
+import { 
+  DirectionsCar,
+  CarRental as CarIcon
+} from '@mui/icons-material';
 
 const PageContainer = styled(Box)({
   background: 'linear-gradient(90deg, #1DB954 0%, #121212 100%)',
@@ -90,6 +94,29 @@ const SpecTable = styled(Table)({
   },
 });
 
+const LogoContainer = styled(Link)({
+  position: "absolute",
+  top: "20px",
+  left: "20px",
+  zIndex: 2,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  textDecoration: 'none',
+  '& .car-icon': {
+    fontSize: '2.5rem',
+    color: '#1DB954',
+  },
+});
+
+const LogoText = styled(Typography)({
+  fontSize: '2rem',
+  fontWeight: 'bold',
+  background: 'linear-gradient(45deg, #1DB954, #fff)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+});
+
 function AdDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -147,6 +174,10 @@ function AdDetailsPage() {
 
   return (
     <PageContainer>
+      <LogoContainer to="/ads">
+        <CarIcon className="car-icon" />
+        <LogoText>DriftRent</LogoText>
+      </LogoContainer>
       <ContentWrapper>
         <ImageContainer>
           <MainImage src={ad.imageUrl || 'https://via.placeholder.com/800x400?text=No+Image'} alt={ad.title} />
