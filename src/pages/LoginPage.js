@@ -161,7 +161,7 @@ function LoginPage() {
               ? "Already have an account?"
               : "Don't have an account yet?"}{" "}
             <Button
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => navigate('/signup')}
               sx={{ color: "#1DB954", textTransform: "none", fontWeight: 700 }}
             >
               {isSignUp ? "Sign In" : "Sign Up"}
