@@ -28,6 +28,7 @@ import {
   FilterList as FilterIcon,
   AccountCircle,
   AttachMoney,
+  Timeline,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -127,6 +128,7 @@ function AdsPage() {
     gearBox: 'all',
     sort: 'price-asc',
   });
+  const [sortCriteria, setSortCriteria] = useState('price-low-high'); // Default sort
 
   const carBrands = [
     'Audi', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Porsche', 
@@ -217,6 +219,27 @@ function AdsPage() {
     navigate(`/ad/${id}`);
   };
 
+  const sortAds = (adsToSort) => {
+    if (!adsToSort) return [];
+    
+    const sortedAds = [...adsToSort];
+    
+    switch (sortCriteria) {
+      case 'price-low-high':
+        return sortedAds.sort((a, b) => a.price - b.price);
+      case 'price-high-low':
+        return sortedAds.sort((a, b) => b.price - a.price);
+      case 'newest-first':
+        return sortedAds.sort((a, b) => b.carDTO.yearOfManufacture - a.carDTO.yearOfManufacture);
+      case 'horsepower-high-low':
+        return sortedAds.sort((a, b) => b.carDTO.horsePower - a.carDTO.horsePower);
+      case 'kilometers-low-high':
+        return sortedAds.sort((a, b) => a.carDTO.km - b.carDTO.km);
+      default:
+        return sortedAds;
+    }
+  };
+
   return (
     <PageContainer>
       <SearchBar>
@@ -294,15 +317,19 @@ function AdsPage() {
                 <FormControl sx={{ minWidth: 200 }}>
                   <Typography color="white" gutterBottom>Sort By</Typography>
                   <Select
-                    value={filters.sort}
-                    onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
-                    sx={{ color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                    value={sortCriteria}
+                    onChange={(e) => setSortCriteria(e.target.value)}
+                    sx={{ 
+                      color: '#fff', 
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      '& .MuiSelect-icon': { color: '#fff' }
+                    }}
                   >
-                    <MenuItem value="price-asc">Price: Low to High</MenuItem>
-                    <MenuItem value="price-desc">Price: High to Low</MenuItem>
-                    <MenuItem value="newest">Newest First</MenuItem>
-                    <MenuItem value="hp-desc">Horsepower: High to Low</MenuItem>
-                    <MenuItem value="km-asc">Kilometers: Low to High</MenuItem>
+                    <MenuItem value="price-low-high">Price: Low to High</MenuItem>
+                    <MenuItem value="price-high-low">Price: High to Low</MenuItem>
+                    <MenuItem value="newest-first">Newest First</MenuItem>
+                    <MenuItem value="horsepower-high-low">Horsepower: High to Low</MenuItem>
+                    <MenuItem value="kilometers-low-high">Kilometers: Low to High</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -389,7 +416,7 @@ function AdsPage() {
           </Box>
         ) : (
           <Grid container spacing={3}>
-            {ads.map((ad) => (
+            {sortAds(ads).map((ad) => (
               <Grid item xs={12} sm={6} md={4} key={ad.id}>
                 <Fade in={true}>
                   <CarCard onClick={() => handleCardClick(ad.id)}>
@@ -417,16 +444,40 @@ function AdsPage() {
                       </Box>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         <FeatureChip
-                          icon={<Settings />}
-                          label={ad.carDTO.gearBox}
+                          icon={<Timeline />}
+                          label={`${ad.carDTO.km || 0} km`}
+                          sx={{ 
+                            background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                            color: '#1DB954',
+                            border: '1px solid rgba(29, 185, 84, 0.3)',
+                          }}
                         />
                         <FeatureChip
                           icon={<Speed />}
-                          label={`${ad.carDTO.kilometers} km`}
+                          label={`${ad.carDTO.horsePower || 0} HP`}
+                          sx={{ 
+                            background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                            color: '#1DB954',
+                            border: '1px solid rgba(29, 185, 84, 0.3)',
+                          }}
+                        />
+                        <FeatureChip
+                          icon={<Settings />}
+                          label={ad.carDTO.gearBox}
+                          sx={{ 
+                            background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                            color: '#1DB954',
+                            border: '1px solid rgba(29, 185, 84, 0.3)',
+                          }}
                         />
                         <FeatureChip
                           icon={<LocalGasStation />}
                           label={ad.carDTO.fuelType}
+                          sx={{ 
+                            background: 'linear-gradient(45deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.2))',
+                            color: '#1DB954',
+                            border: '1px solid rgba(29, 185, 84, 0.3)',
+                          }}
                         />
                       </Box>
                     </Box>
