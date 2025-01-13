@@ -29,8 +29,9 @@ import {
   AccountCircle,
   AttachMoney,
   Timeline,
+  CarRental as CarIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 // Animations
 const fadeIn = keyframes`
@@ -111,6 +112,39 @@ const FeatureChip = styled(Chip)({
   '&:hover': {
     backgroundColor: 'rgba(29, 185, 84, 0.2)',
   },
+});
+
+const LogoContainer = styled(Link)({
+  position: "fixed",
+  top: "20px",
+  left: "20px",
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  textDecoration: 'none',
+  '& .car-icon': {
+    fontSize: '2.5rem',
+    color: '#1DB954',
+  },
+  background: 'rgba(10, 10, 10, 0.5)',
+  padding: '8px 12px',
+  borderRadius: '12px',
+  backdropFilter: 'blur(8px)',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: 'rgba(10, 10, 10, 0.7)',
+    transform: 'translateY(2px)',
+  },
+});
+
+const LogoText = styled(Typography)({
+  fontSize: '2rem',
+  fontWeight: 'bold',
+  background: 'linear-gradient(45deg, #1DB954, #fff)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
 });
 
 function AdsPage() {
@@ -242,6 +276,11 @@ function AdsPage() {
 
   return (
     <PageContainer>
+      <LogoContainer to="/">
+        <CarIcon className="car-icon" />
+        <LogoText>DriftRent</LogoText>
+      </LogoContainer>
+
       <SearchBar>
         <Container maxWidth="lg">
           <Grid container spacing={3} alignItems="center">

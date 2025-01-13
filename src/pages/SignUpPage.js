@@ -10,6 +10,7 @@ import {
   Link,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../api';
 
 const PageContainer = styled(Box)({
   background: 'linear-gradient(135deg, #1DB954 0%, #121212 100%)',
@@ -63,11 +64,13 @@ const SubmitButton = styled(Button)({
 function SignUpPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
+  const [message, setMessage] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -76,10 +79,32 @@ function SignUpPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your signup logic here
-    console.log('Sign up data:', formData);
+    
+    if (formData.password !== formData.confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await registerUser(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName
+      );
+      
+      localStorage.setItem("userEmail", formData.email);
+      
+      setMessage("Account created successfully!");
+      setTimeout(() => {
+        navigate('/ads');
+      }, 1000);
+    } catch (error) {
+      console.error('Registration error:', error);
+      setMessage(error.response?.data?.message || "Registration failed. Please try again.");
+    }
   };
 
   return (
@@ -96,9 +121,17 @@ function SignUpPage() {
           <form onSubmit={handleSubmit}>
             <StyledTextField
               fullWidth
-              label="Username"
-              name="username"
-              value={formData.username}
+              label="First Name"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
+            <StyledTextField
+              fullWidth
+              label="Last Name"
+              name="lastName"
+              value={formData.lastName}
               onChange={handleChange}
               required
             />
@@ -129,6 +162,16 @@ function SignUpPage() {
               onChange={handleChange}
               required
             />
+
+            {message && (
+              <Typography 
+                color={message.includes("successfully") ? "#1DB954" : "error"} 
+                align="center" 
+                sx={{ mt: 2 }}
+              >
+                {message}
+              </Typography>
+            )}
 
             <SubmitButton
               type="submit"
