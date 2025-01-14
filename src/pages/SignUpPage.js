@@ -69,6 +69,7 @@ function SignUpPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    phoneNumber: '',
   });
   const [message, setMessage] = useState('');
 
@@ -92,7 +93,8 @@ function SignUpPage() {
         formData.email,
         formData.password,
         formData.firstName,
-        formData.lastName
+        formData.lastName,
+        formData.phoneNumber
       );
       
       localStorage.setItem("userEmail", formData.email);
@@ -161,6 +163,17 @@ function SignUpPage() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+            />
+            <StyledTextField
+              fullWidth
+              label="Phone Number"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+              placeholder="+1234567890"
+              helperText="Include country code (e.g., +1 for USA)"
+              sx={{ mb: 2 }}
             />
 
             {message && (

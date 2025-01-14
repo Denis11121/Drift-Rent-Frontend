@@ -300,7 +300,7 @@ const OwnerProfileDialog = ({ open, onClose, owner }) => {
         }}>
           <Button
             startIcon={<Phone />}
-            onClick={() => window.location.href = `tel:${owner?.phone || ''}`}
+            onClick={() => window.location.href = `tel:${owner?.phoneNumber}`}
             sx={{
               color: '#fff',
               backgroundColor: 'rgba(29, 185, 84, 0.1)',
@@ -315,7 +315,7 @@ const OwnerProfileDialog = ({ open, onClose, owner }) => {
               },
             }}
           >
-            Call
+            Call {owner?.phoneNumber}
           </Button>
           <Button
             startIcon={<Email />}
@@ -338,7 +338,7 @@ const OwnerProfileDialog = ({ open, onClose, owner }) => {
           </Button>
           <Button
             startIcon={<WhatsApp />}
-            onClick={() => window.open(`https://wa.me/${owner?.phone || ''}?text=I'm interested in your car`)}
+            onClick={() => window.open(`https://wa.me/${owner?.phoneNumber?.replace(/[^0-9]/g, '')}?text=I'm interested in your car`)}
             sx={{
               color: '#fff',
               backgroundColor: 'rgba(29, 185, 84, 0.1)',
@@ -559,6 +559,7 @@ function AdDetailsPage() {
           firstName: ad?.ownerFirstName,
           lastName: ad?.ownerLastName,
           email: ad?.ownerEmail,
+          phoneNumber: ad?.ownerPhone,
           rating: ad?.ownerRating,
         }}
       />
