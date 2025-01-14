@@ -7,7 +7,7 @@ const API = axios.create({
 export const loginUser = (email, password) => 
     API.post('/login', { email, password });
 
-export const registerUser = async (email, password, firstName, lastName) => {
+export const registerUser = async (email, password, firstName, lastName, phoneNumber) => {
   const response = await fetch('http://localhost:8081/user/create', {
     method: 'POST',
     headers: {
@@ -17,7 +17,8 @@ export const registerUser = async (email, password, firstName, lastName) => {
       email,
       password,
       firstName,
-      lastName
+      lastName,
+      phoneNumber
     }),
   });
 
